@@ -2,6 +2,7 @@ import signupImg from "../assets/images/signup.gif";
 import avatar from "../assets/images/doctor-img01.png";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import uploadImageToCloudinary from "../utils/uploadCloudinary";
 
 const Signup = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -20,17 +21,20 @@ const Signup = () => {
     setfromData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileInputChange = async (event) =>{
+  const handleFileInputChange = async (event) => {
     const file = event.target.files[0];
 
     //later we will use Cloudinary to upload images
+    const data = await uploadImageToCloudinary(file);
 
-    console.log(file)
-  }
+    console.log(data);
+  };
 
-  const submitHandler = async event => {
+  const submitHandler = async (event) => {
+    console.log(formData);
+
     event.preventDefault();
-  }
+  };
 
   return (
     <section className="px-5 xl:px-0">
@@ -78,7 +82,7 @@ const Signup = () => {
                 <input
                   type="password"
                   placeholder="Enter Your Password"
-                  name="name"
+                  name="password"
                   value={formData.password}
                   onChange={handleInputChange}
                   className="w-full pr-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
