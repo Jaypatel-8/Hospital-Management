@@ -1,21 +1,27 @@
 import signupImg from "../assets/images/signup.gif";
-import avatar from "../assets/images/doctor-img01.png";
-import { Link } from "react-router-dom";
+// import avatar from "../assets/images/doctor-img01.png";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import uploadImageToCloudinary from "../utils/uploadCloudinary";
+import { BASE_URL } from "../config";
+import { toast } from "react-toastify";
+import HashLoader from "react-spinners/HashLoader";
 
 const Signup = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [formData, setfromData] = useState({
     name: "",
     email: "",
     password: "",
-    photo: "",
+    photo: selectedFile,
     gender: "",
     role: "patient",
   });
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setfromData({ ...formData, [e.target.name]: e.target.value });
@@ -27,15 +33,42 @@ const Signup = () => {
     //later we will use Cloudinary to upload images
     const data = await uploadImageToCloudinary(file);
 
-    console.log(data);
+    setPreviewUrl(data.url);
+    setSelectedFile(data.url);
+    setfromData({ ...formData, photo: data.url });
   };
 
   const submitHandler = async (event) => {
-    console.log(formData);
-
     event.preventDefault();
-  };
+    setLoading(true);
 
+    console.log("Submitting user data:", formData);
+
+    try {
+      const res = await fetch(`${BASE_URL}/auth/register`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      console.log(res);
+
+      const { message } = await res.json();
+
+      if (!res.ok) {
+        throw new Error(message);
+      }
+
+      setLoading(false);
+      toast.success(message);
+      navigate("/login");
+    } catch (err) {
+      toast.error(err.message);
+      setLoading(false);
+    }
+  };
   return (
     <section className="px-5 xl:px-0">
       <div className="max-w-[1170px] mx-auto">
@@ -114,6 +147,7 @@ const Signup = () => {
                     id=""
                     className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3focus:ouline-none"
                   >
+                    <option value="">Select</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
@@ -122,14 +156,19 @@ const Signup = () => {
               </div>
 
               <div className="mb-5 flex items-center gap-3">
-                <figure
-                  className="w-[60px] h-[60px] rounded-full 
+                {selectedFile && (
+                  <figure
+                    className="w-[60px] h-[60px] rounded-full 
                 border-2 border-solid border-primaryColor flex items-center justify-center"
-                >
-                  <img src={avatar} alt="" className="w-full rounded-full" />
-                </figure>
-
-                <div className="relative w-[160px] h-[50px] ">
+                  >
+                    <img
+                      src={previewUrl}
+                      alt=""
+                      className="w-full rounded-full"
+                    />
+                  </figure>
+                )}
+                <div className="relative w-[121px] h-[50px] ">
                   <input
                     type="file"
                     name="photo"
@@ -150,10 +189,11 @@ const Signup = () => {
 
               <div className="mt-7">
                 <button
+                  disabled={loading && true}
                   type="submit"
                   className="w-full bg-primaryColor text-white text-[18px leading-[30px] rounded-lg px-4 py-3"
                 >
-                  Sign Up
+                  {loading ? <HashLoader size={35} color="#ffff" /> : "Sign Up"}
                 </button>
               </div>
 

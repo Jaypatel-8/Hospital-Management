@@ -3,13 +3,11 @@ import Doctor from "../models/DoctorSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const generateToken = user => {
+const generateToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET_KEY
   );
-  
-  
 };
 
 export const register = async (req, res) => {
@@ -38,9 +36,9 @@ export const register = async (req, res) => {
         name,
         email,
         password: hashPassword,
-        photo,
-        gender,
         role,
+        gender,
+        photo,
       });
     }
 
@@ -49,9 +47,9 @@ export const register = async (req, res) => {
         name,
         email,
         password: hashPassword,
-        photo,
-        gender,
         role,
+        gender,
+        photo,
       });
     }
 
@@ -108,7 +106,7 @@ export const login = async (req, res) => {
       success: true,
       message: "successfully login",
       token,
-      data: { ...rest } ,
+      data: { ...rest },
       role,
     });
   } catch (err) {
