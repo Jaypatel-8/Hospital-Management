@@ -1,5 +1,4 @@
 import signupImg from "../assets/images/signup.gif";
-// import avatar from "../assets/images/doctor-img01.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import uploadImageToCloudinary from "../utils/uploadCloudinary";
@@ -42,8 +41,6 @@ const Signup = () => {
     event.preventDefault();
     setLoading(true);
 
-    console.log("Submitting user data:", formData);
-
     try {
       const res = await fetch(`${BASE_URL}/auth/register`, {
         method: "post",
@@ -52,8 +49,6 @@ const Signup = () => {
         },
         body: JSON.stringify(formData),
       });
-
-      console.log(res);
 
       const { message } = await res.json();
 
